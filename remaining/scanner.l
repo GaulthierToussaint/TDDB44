@@ -23,14 +23,17 @@ extern YYLTYPE yylloc; // Used for position information, see below.
 /* If you want to include any flex declarations, this is where to do it. */
 
 %x c_comment
+%x c_string
+%x d_comment
 DIGIT [0-9]
+LETTER [a-zA-Z]
 /* {DIGIT}+"."{DIGIT}*
- ID [a-z][a-z0-9]* */
+ /*ID [a-z][a-z0-9]* */
 
 /* Position information is entered into the yylloc variable, so we will be
-   able to generate good error messages later in later phases. */
+   /*able to generate good error messages later in later phases. */
 /* Your code should be entered below the %%. Expressions to handle the
-   following: Diesel comments, Diesel string constants, Diesel
+   /*following: Diesel comments, Diesel string constants, Diesel
    identifiers, integers, reals, and whitespace. */
 %%
 
@@ -139,69 +142,230 @@ DIGIT [0-9]
 
 
 of                       {
-                            
+                            yylloc.first_line = yylineno;
+                            yylloc.first_column = column;
+                            column += yyleng;
+                            return T_OF;
                          }
 if                       {
-                            
+                            yylloc.first_line = yylineno;
+                            yylloc.first_column = column;
+                            column += yyleng;
+                            return T_IF;
                          }
 do                       {
-                            
+                            yylloc.first_line = yylineno;
+                            yylloc.first_column = column;
+                            column += yyleng;
+                            return T_DO;
                          }
 or                       {
-                            
+                            yylloc.first_line = yylineno;
+                            yylloc.first_column = column;
+                            column += yyleng;
+                            return T_OR;
                          }
 var                      {
-                            
+                            yylloc.first_line = yylineno;
+                            yylloc.first_line = yylineno;
+                            yylloc.first_column = column;
+                            column += yyleng;
+                            return T_VAR;
                          }
 end                      {
-                            
-                         }
+                           yylloc.first_line = yylineno;
+                           yylloc.first_line = yylineno;
+                           yylloc.first_column = column;
+                           column += yyleng;
+                           return T_END;
+                        }
 and                      {
-                            
+                            yylloc.first_line = yylineno;
+                            yylloc.first_column = column;
+                            column += yyleng;
+                            return T_AND;
                          }
 div                      {
-                            
+                            yylloc.first_line = yylineno;
+                            yylloc.first_column = column;
+                            column += yyleng;
+                            return T_IDIV;
                          }
 mod                      {
-                            
+                            yylloc.first_line = yylineno;
+                            yylloc.first_column = column;
+                            column += yyleng;
+                            return T_MOD;
                          }
 not                      {
-                            
+                            yylloc.first_line = yylineno;
+                            yylloc.first_column = column;
+                            column += yyleng;
+                            return T_NOT;
                          }
 then                     {
-                            
+                            yylloc.first_line = yylineno;
+                            yylloc.first_column = column;
+                            column += yyleng;
+                            return T_THEN;
                          }
 else                     {
-                            
+                            yylloc.first_line = yylineno;
+                            yylloc.first_column = column;
+                            column += yyleng;
+                            return T_ELSE;
                          }
 const                    {
-                            
+                            yylloc.first_line = yylineno;
+                            yylloc.first_column = column;
+                            column += yyleng;
+                            return T_CONST;
                          }
 array                    {
-                            
+                            yylloc.first_line = yylineno;
+                            yylloc.first_column = column;
+                            column += yyleng;
+                            return T_ARRAY;
                          }
 begin                    {
-                            
+                            yylloc.first_line = yylineno;
+                            yylloc.first_column = column;
+                            column += yyleng;
+                            return T_BEGIN;
                          }
 while                    {
-                            
+                            yylloc.first_line = yylineno;
+                            yylloc.first_column = column;
+                            column += yyleng;
+                            return T_WHILE;
                          }
 elsif                    {
-                            
+                            yylloc.first_line = yylineno;
+                            yylloc.first_column = column;
+                            column += yyleng;
+                            return T_ELSIF;
                          }
 return                   {
-                            
-                         }
+                            yylloc.first_line = yylineno;
+                            yylloc.first_column = column;
+                            column += yyleng;
+                            return T_RETURN;
+                          }
 program                  {
-                            
-                         }
+                           yylloc.first_line = yylineno;
+                           yylloc.first_column = column;
+                           return T_PROGRAM;
+                        }
 function                 {
-                            
+                            yylloc.first_line = yylineno;
+                            yylloc.first_column = column;
+                            column += yyleng;
+                            return T_FUNCTION;
                          }
 procedure                {
-                            
+                            yylloc.first_line = yylineno;
+                            yylloc.first_column = column;
+                            column += yyleng;
+                            return T_PROCEDURE;
                          }
+{DIGIT}+                 {
+                            yylval.ival = atoi(yytext);
+                            yylloc.first_line = yylineno;
+                            yylloc.first_column = column;
+                            column += yyleng;
+                            return T_INTNUM;
+                         }
+{DIGIT}+[eE][+-]?{DIGIT}+               {
+                                          yylval.rval = atof(yytext);
+                                          yylloc.first_line = yylineno;
+                                          yylloc.first_column = column;
+                                          column += yyleng;
+                                          return T_REALNUM;
+                                        }
+{DIGIT}+"."                              {
+                                          yylval.rval = atof(yytext);
+                                          yylloc.first_line = yylineno;
+                                          yylloc.first_column = column;
+                                          column += yyleng;
+                                          return T_REALNUM;
+                                       }
+{DIGIT}*"."{DIGIT}+([eE][+-]?{DIGIT}+)?   {
+                                        yylval.rval = atof(yytext);
+                                        yylloc.first_line = yylineno;
+                                        yylloc.first_column = column;
+                                        column += yyleng;
+                                        return T_REALNUM;
+                                       }
+" "                                    {
+                                        yylloc.first_column = column;
+                                        column++;
+                                      }
+[\t]+                                 {
+                                        yylloc.first_column = column;
+                                        column += yyleng;
+                                      }
+[\n]+                                 {
+                                        yylloc.first_column = column;
+                                        column = 0;
+                                      }
 
+"\'"                                   {
+                                        yymore();
+                                        BEGIN(c_string);
+                                       }
+
+<c_string>
+{
+  "\'"                                {
+                                        yylval.pool_p = sym_tab->pool_install(sym_tab->fix_string(yytext));
+                                        yylloc.first_line = yylineno;
+                                        yylloc.first_column = column;
+                                        column += yyleng;
+                                        BEGIN(INITIAL);
+                                        return T_STRINGCONST;
+                                      }
+  "\'\'"                              {
+                                        yymore();
+                                      }
+  \n                                  {
+                                        yyerror("Newline in string");
+                                        BEGIN(INITIAL);
+                                      }
+
+  [^\n]                               {
+                                        yymore();
+                                      }
+
+  <<EOF>>                             {
+                                        yyerror("Unterminated string");
+                                        yyterminate();
+                                      }
+
+}
+
+"\{"                                  {
+                                        column+= yyleng;
+                                        BEGIN(d_comment);
+                                      }
+
+<d_comment>
+{
+
+  "\}"                {
+                          column += 2;
+                          BEGIN(INITIAL);
+                       }
+  "\{"                {
+                          column += 2;
+                          yyerror("Suspicious diesel comment");
+                       }
+  [^\n]                column++; /* Skip stuff in comments */
+  \n                   column = 0;
+  <<EOF>>              {
+                          yyerror("Unterminated comment");
+                          yyterminate();
+                       }
+}
 
 \/\/.*$                  column = 0; /* Skip single-line comment */
 "/\*"                    {
@@ -227,7 +391,14 @@ procedure                {
                          }
 }
 
- 
+({LETTER}|"_")({LETTER}|{DIGIT}|"_"])* {
+                                              yylval.pool_p = sym_tab->pool_install(sym_tab->capitalize(yytext));
+                                              yylloc.first_line = yylineno;
+                                              yylloc.first_column = column;
+                                              column += yyleng;
+                                              return T_IDENT;
+                                            }
 
 <<EOF>>                  yyterminate();
+
 .                        yyerror("Illegal character");
