@@ -533,6 +533,7 @@ void symbol_table::open_scope()
 {
     /* Your code here */
     current_level++;
+    // Update the block table with the current level
     // sym_pos: index of the last symbol entered in the table
     block_table[current_level] = sym_pos;
 }
@@ -542,10 +543,12 @@ void symbol_table::open_scope()
 sym_index symbol_table::close_scope()
 {
     /* Your code here */
-    for(sym_index i = sym_pos; i > current_environment(); i--){
+    for(sym_index i = sym_pos; i > current_environment(); i--)
+    {
       symbol *sym = get_symbol(i);
       hash_index hi = sym->back_link;
-      if(hash_table[hi] == i){
+      if(hash_table[hi] == i)
+      {
         hash_table[hi] = sym->hash_link;
         sym_table[i]->hash_link = NULL_SYM;
       }
@@ -564,7 +567,10 @@ sym_index symbol_table::close_scope()
 sym_index symbol_table::lookup_symbol(const pool_index pool_p)
 {
     /* Your code here */
-
+    sym_index sym_table_index = hash_table[hash(pool_p)];
+    while (sym_table_index != NULL_SYM){
+      
+    }
     return NULL_SYM;
 }
 
