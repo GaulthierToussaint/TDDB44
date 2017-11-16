@@ -172,7 +172,20 @@ long symbol_table::get_next_label()
 sym_index symbol_table::gen_temp_var(sym_index type)
 {
     /* Your code here */
-    return NULL_SYM;
+    static int nb_var = 1;
+    string tmp;
+
+    if (type==void_type){
+      fatal("Not meaningful to create a void temporary variable");
+    }
+
+    tmp = "$" + to_string(nb_var);
+    pool_index pool_tmp = pool_install((char*)tmp.c_str());
+
+    sym_index tmp_sym = enter_variable(pool_tmp,type);
+
+    nb_var++;
+    return tmp_sym;
 }
 
 
@@ -532,6 +545,9 @@ sym_index symbol_table::current_environment()
 void symbol_table::open_scope()
 {
     /* Your code here */
+    if(current_level == MAX_BLOCK){
+      fatal("No more block can be declared");
+    }
     current_level++;
     // Update the block table with the current level
     // sym_pos: index of the last symbol entered in the table
@@ -545,11 +561,11 @@ sym_index symbol_table::close_scope()
     /* Your code here */
     for(sym_index i = sym_pos; i > current_environment(); i--)
     {
-      symbol *sym = get_symbol(i);
-      hash_index hi = sym->back_link;
+
+      hash_index hi = sym_table[i]->back_link;
       if(hash_table[hi] == i)
       {
-        hash_table[hi] = sym->hash_link;
+        hash_table[hi] = sym_table[i]->hash_link;
         sym_table[i]->hash_link = NULL_SYM;
       }
     }
@@ -569,7 +585,10 @@ sym_index symbol_table::lookup_symbol(const pool_index pool_p)
     /* Your code here */
     sym_index sym_table_index = hash_table[hash(pool_p)];
     while (sym_table_index != NULL_SYM){
-      
+      if (pool_compare(sym_table[sym_table_index]->id,pool_p)){
+        return sym_table_index;
+      }
+      sym_table_index = sym_table[sym_table_index]->hash_link;
     }
     return NULL_SYM;
 }
@@ -661,7 +680,59 @@ sym_index symbol_table::install_symbol(const pool_index pool_p,
                                        const sym_type tag)
 {
     /* Your code here */
-    return 0; // Return index to the symbol we just created.
+    sym_index i = lookup_symbol(pool_p);
+    if ( i != NULL_SYM && sym_table[i]->level == current_level){
+      return lookup_symbol(pool_p);
+    }
+
+    if (sym_pos == MAX_SYM){
+      fatal("Symbol entirely filled");
+    }
+
+    if(current_level == MAX_BLOCK){
+      fatal("No more blocks can be declared");
+    }
+    symbol* s;
+    switch (tag) {
+      case SYM_VAR:
+      s = new variable_symbol(pool_p);
+      break;
+      case SYM_FUNC:
+      s = new function_symbol(pool_p);
+      break;
+      case SYM_PROC:
+      s = new procedure_symbol(pool_p);
+      break;
+      case SYM_CONST:
+      s = new constant_symbol(pool_p);
+      break;
+      case SYM_ARRAY:
+      s = new array_symbol(pool_p);
+      break;
+      case SYM_NAMETYPE:
+      s = new nametype_symbol(pool_p);
+      break;
+      case SYM_PARAM:
+      s = new parameter_symbol(pool_p);
+      break;
+      case SYM_UNDEF:
+      s = new symbol(pool_p);
+      cerr << "This symbol isn't recognized" << flush;
+      break;
+    }
+
+      ++sym_pos;
+      s->hash_link = hash_table[hash(pool_p)];
+      s->back_link = hash(pool_p);
+      s->id = pool_p;
+      s->tag = SYM_UNDEF;
+      s->type = void_type;
+      s->level = current_level;
+
+      sym_table[sym_pos] = s;
+      hash_table[hash(pool_p)] = sym_pos;
+
+    return sym_pos; // Return index to the symbol we just created.
 }
 
 /* Enter a constant into the symbol table. The value is an integer. The type
@@ -906,7 +977,25 @@ sym_index symbol_table::enter_procedure(position_information *pos,
                                         const pool_index pool_p)
 {
     /* Your code here */
-    return NULL_SYM;
+    sym_index sym_p = install_symbol(pool_p, SYM_PROC);
+    procedure_symbol* proc = sym_table[sym_p]->get_procedure_symbol();
+
+    if (proc->tag != SYM_UNDEF) {
+        type_error(pos) << "Redeclaration: " << proc << endl;
+        return sym_p; // returns the original symbol
+    }
+
+    proc->tag = SYM_PROC;
+
+    proc->last_parameter = NULL;
+
+    // This will grow as local variables and temporaries are added.
+    proc->ar_size = 0;
+    proc->label_nr = get_next_label();
+
+    sym_table[sym_p] = proc;
+
+    return sym_p;
 }
 
 
