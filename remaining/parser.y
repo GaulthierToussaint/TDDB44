@@ -180,6 +180,13 @@ prog_decl       : prog_head T_SEMICOLON const_part variable_part
 prog_head       : T_PROGRAM T_IDENT
                 {
                     /* Your code here */
+                    // Pretty similar as proc_head line 425
+                    position_information *pos =
+                        new position_information(@1.first_line,@1.first_column);
+                    // We add the program id to the symbol table.
+                    sym_index proc_loc = sym_tab->enter_procedure(pos,$2);
+                    $$ = new ast_procedurehead(pos,proc_loc);
+                    // Open a new scope.
                     sym_tab->open_scope();
                 }
                 ;
@@ -199,10 +206,17 @@ const_decls     : const_decl
 const_decl      : T_IDENT T_EQ integer T_SEMICOLON
                 {
                     /* Your code here */
+                    position_information *pos =
+                        new position_information(@1.first_line,@1.first_column);
+                    sym_tab->enter_constant(pos,$1, integer_type, $3->value);
+
                 }
                 | T_IDENT T_EQ real T_SEMICOLON
                 {
                     /* Your code here */
+                    position_information *pos =
+                        new position_information(@1.first_line,@1.first_column);
+                    sym_tab->enter_constant(pos,$1, real_type, $3->value);
                 }
                 | T_IDENT T_EQ T_STRINGCONST T_SEMICOLON
                 {
@@ -210,15 +224,18 @@ const_decl      : T_IDENT T_EQ integer T_SEMICOLON
                 }
                 | T_IDENT T_EQ const_id T_SEMICOLON
                 {
-
                     // This part of code is a bit ugly, but it's needed to
                     // allow constructions like this:
                     // constant foo = 5;
                     // constant bar = foo;
                     // ...now, why would anyone want to do that?
                     /* Your code here */
+                    position_information *pos =
+                        new position_information(@1.first_line,@1.first_column);
+                    ////////////////////////////////////////////////////////////////////////////
+
                 }
-                
+
                 ;
 
 
@@ -288,7 +305,7 @@ var_decl        : T_IDENT T_COLON type_id T_SEMICOLON
                         }
                     }
                 }
-                
+
                 ;
 
 
@@ -543,7 +560,7 @@ stmt            : T_IF expr T_THEN stmt_list elsif_list else_part T_END
                 {
                     /* Your code here */
                 }
-                
+
                 | /* empty */
                 {
                     /* Your code here */
@@ -575,7 +592,7 @@ rvariable       : rvar_id
                 {
                     /* Your code here */
                 }
-                
+
                 ;
 
 
@@ -731,7 +748,7 @@ factor          : rvariable
                 {
                     /* Your code here */
                 }
-                
+
                 ;
 
 
@@ -740,7 +757,7 @@ func_call       : func_id T_LEFTPAR opt_expr_list T_RIGHTPAR
                     /* Your code here */
                 }
                 |
-                
+
                 ;
 
 

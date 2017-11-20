@@ -3,8 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-
-#include "scanner.hh"
+#include "ast.h"
+#include "parser.hh"
+//#include "scanner.hh"
 #include "symtab.hh"
 // This is where you put #include directives as needed for later labs.
 // include "ast.hh", parser.hh" in that order
