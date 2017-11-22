@@ -260,7 +260,8 @@ var_decl        : T_IDENT T_COLON type_id T_SEMICOLON
                 {
                     /* Your code here */
                     position_information *pos =
-                        new position_information(@1.first_line,@1.first_column);
+                        new position_information(@1.first_line,
+                                                @1.first_column);
                     sym_tab->enter_variable(pos,$1,$3->sym_p);
                 }
                 | T_IDENT T_COLON T_ARRAY T_LEFTBRACKET integer T_RIGHTBRACKET T_OF type_id T_SEMICOLON
@@ -294,8 +295,7 @@ var_decl        : T_IDENT T_COLON type_id T_SEMICOLON
                     // defer checking until the semantic phase.
 
                     // Find the const_id's symbol in the symbol table.
-                    symbol *tmp =
-                        sym_tab->get_symbol($5->sym_p);
+                    symbol *tmp = sym_tab->get_symbol($5->sym_p);
 
                     // Make sure it exists. This should belong in a later pass,
                     // but if we don't do it here and NULL is returned (which
@@ -445,9 +445,10 @@ func_decl       : func_head opt_param_list T_COLON type_id T_SEMICOLON const_par
                     
                     position_information *pos =
                         new position_information(@1.first_line,@1.first_column);
-                    sym_tab->set_symbol_type($1->sym_p,$4->sym_p);
                     $$ = $1;
-                    sym_tab->enter_function(pos,$4->sym_p);
+                    sym_tab->set_symbol_type($1->sym_p,$4->sym_p);
+                    
+                    //sym_tab->enter_function(pos,$4->sym_p);
                     
                 }
                 ;
@@ -570,7 +571,7 @@ stmt_list       : stmt
                     if($3!=NULL){
                         $$ = new ast_stmt_list(pos,$3,$1);
                     }else{
-                        $$=NULL;
+                        $$=$1;
                     }
                 }
                 ;
@@ -910,6 +911,8 @@ func_call       : func_id T_LEFTPAR opt_expr_list T_RIGHTPAR
                                                  @1.first_column);
                     $$ = new ast_functioncall(pos,$1,$3);
                 }
+                |
+                
                 ;
 
 
