@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "ast.h"
+#include "ast.hh"
 #include "parser.hh"
 //#include "scanner.hh"
 #include "symtab.hh"
