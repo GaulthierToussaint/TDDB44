@@ -242,7 +242,22 @@ const_decl      : T_IDENT T_EQ integer T_SEMICOLON
                     }
 
                 }
-
+                | T_IDENT T_EQ integer
+                {
+                    cout << "Syntax error : missing semicolon" << endl;
+                }
+                | T_IDENT T_EQ real
+                {
+                    cout << "Syntax error : missing semicolon" << endl;
+                }
+                | T_IDENT T_EQ const_id
+                {
+                    cout << "Syntax error : missing semicolon" << endl;
+                }
+                | T_IDENT T_EQ T_STRINGCONST
+                {
+                    cout << "Syntax error : missing semicolon" << endl;
+                }
                 ;
 
 
@@ -644,6 +659,11 @@ lvariable       : lvar_id
                 {
                     $$ = NULL;
                 }
+                | array_id T_LEFTBRACKET expr
+                {
+                    cout << "Syntax error: missing bracket" << endl;
+                    $$ = NULL;
+                }
                 ;
 
 
@@ -660,7 +680,11 @@ rvariable       : rvar_id
                                                  @1.first_column);
                     $$ = new ast_indexed(pos, $1, $3);
                 }
-
+                | array_id T_LEFTBRACKET expr
+                {
+                    cout << "Syntax error: missing bracket" << endl;
+                    $$ = NULL;
+                }
                 ;
 
 
