@@ -393,7 +393,7 @@ procedure                {
                          }
 }
 
-({LETTER}|"_")({LETTER}|{DIGIT}|"_"])* {
+[a-z]([a-z]|{DIGIT}|[_])* {
                                               yylval.pool_p = sym_tab->pool_install(sym_tab->capitalize(yytext));
                                               yylloc.first_line = yylineno;
                                               yylloc.first_column = column;
