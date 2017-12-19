@@ -271,28 +271,28 @@ procedure                {
                             return T_PROCEDURE;
                          }
 {DIGIT}+                 {
-                            yylval.ival = stol(yytext);
+                            yylval.ival = stoi(yytext);
                             yylloc.first_line = yylineno;
                             yylloc.first_column = column;
                             column += yyleng;
                             return T_INTNUM;
                          }
 {DIGIT}+[eE][+-]?{DIGIT}+               {
-                                          yylval.rval = stod(yytext);
+                                          yylval.rval = atof(yytext);
                                           yylloc.first_line = yylineno;
                                           yylloc.first_column = column;
                                           column += yyleng;
                                           return T_REALNUM;
                                         }
 {DIGIT}+"."                              {
-                                          yylval.rval = stod(yytext);
+                                          yylval.rval = atof(yytext);
                                           yylloc.first_line = yylineno;
                                           yylloc.first_column = column;
                                           column += yyleng;
                                           return T_REALNUM;
                                        }
 {DIGIT}*"."{DIGIT}+([eE][+-]?{DIGIT}+)?   {
-                                        yylval.rval = stod(yytext);
+                                        yylval.rval = atof(yytext);
                                         yylloc.first_line = yylineno;
                                         yylloc.first_column = column;
                                         column += yyleng;

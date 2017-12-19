@@ -52,9 +52,9 @@ bool ast_optimizer::is_constant(ast_expression* left, ast_expression* right){
         sym_index left_index = left->get_ast_id()->sym_p;
         symbol* left_symbol = sym_tab->get_symbol(left_index);
         if(left_symbol->tag == SYM_CONST){
-            return true;            
+            return true;
         }
-    }    
+    }
     return false;
 }
 

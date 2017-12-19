@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "ast.hh"
+#include "ast.h"
 #include "parser.hh"
 //#include "scanner.hh"
 #include "symtab.hh"
@@ -271,28 +271,28 @@ procedure                {
                             return T_PROCEDURE;
                          }
 {DIGIT}+                 {
-                            yylval.ival = stol(yytext);
+                            yylval.ival = atoi(yytext);
                             yylloc.first_line = yylineno;
                             yylloc.first_column = column;
                             column += yyleng;
                             return T_INTNUM;
                          }
 {DIGIT}+[eE][+-]?{DIGIT}+               {
-                                          yylval.rval = stod(yytext);
+                                          yylval.rval = atof(yytext);
                                           yylloc.first_line = yylineno;
                                           yylloc.first_column = column;
                                           column += yyleng;
                                           return T_REALNUM;
                                         }
 {DIGIT}+"."                              {
-                                          yylval.rval = stod(yytext);
+                                          yylval.rval = atof(yytext);
                                           yylloc.first_line = yylineno;
                                           yylloc.first_column = column;
                                           column += yyleng;
                                           return T_REALNUM;
                                        }
 {DIGIT}*"."{DIGIT}+([eE][+-]?{DIGIT}+)?   {
-                                        yylval.rval = stod(yytext);
+                                        yylval.rval = atof(yytext);
                                         yylloc.first_line = yylineno;
                                         yylloc.first_column = column;
                                         column += yyleng;
@@ -393,7 +393,7 @@ procedure                {
                          }
 }
 
-[a-z]([a-z]|{DIGIT}|[_])* {
+({LETTER}|"_")({LETTER}|{DIGIT}|"_"])* {
                                               yylval.pool_p = sym_tab->pool_install(sym_tab->capitalize(yytext));
                                               yylloc.first_line = yylineno;
                                               yylloc.first_column = column;
