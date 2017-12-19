@@ -176,7 +176,7 @@ sym_index symbol_table::gen_temp_var(sym_index type)
     string tmp;
 
     if (type==void_type){
-      fatal("Not meaningful to create a void temporary variable");
+      fatal("Void type error : Not meaningful to create a void temporary variable");
     }
 
     tmp = "$" + to_string(nb_var);

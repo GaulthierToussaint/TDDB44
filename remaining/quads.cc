@@ -650,14 +650,18 @@ sym_index ast_if::generate_quads(quad_list &q)
     /* Your code here */
 
     long cond_label = sym_tab->get_next_label();
-    long end_label = sym_tab->get_next_label();
+    long end_label = 0;
 
     sym_index first_condition = condition->generate_quads(q);
     q+= new quadruple(q_jmpf,cond_label,first_condition,NULL_SYM);
 
     body->generate_quads(q);
 
-    q+= new quadruple(q_jmp,end_label,NULL_SYM,NULL_SYM);
+    if(elsif_list != NULL ||else_body != NULL){
+        end_label = sym_tab->get_next_label();
+        q+= new quadruple(q_jmp,end_label,NULL_SYM,NULL_SYM);
+    }
+
     q+= new quadruple(q_labl,cond_label,NULL_SYM,NULL_SYM);
 
     if(elsif_list != NULL){
@@ -668,6 +672,7 @@ sym_index ast_if::generate_quads(quad_list &q)
         else_body->generate_quads(q);
     }
 
+    if(end_label != 0)
     q+= new quadruple(q_labl,end_label,NULL_SYM,0);
 
     return NULL_SYM;
@@ -682,16 +687,15 @@ sym_index ast_return::generate_quads(quad_list &q)
     sym_index func_value;
     if(value != NULL){
         func_value = value->generate_quads(q);
+        if(value->type == integer_type){
+            q+= new quadruple(q_ireturn,q.last_label,func_value,NULL_SYM);
+        }else{
+            q+= new quadruple(q_rreturn,q.last_label,func_value,NULL_SYM);
+        }
     }else{
-        return NULL_SYM;
+        func_value = NULL_SYM;
+        q+= new quadruple(q_jmp,q.last_label,func_value,NULL_SYM);
     }
-
-    if(value->type == integer_type){
-        q+= new quadruple(q_ireturn,q.last_label,func_value,0);
-    }else{
-        q+= new quadruple(q_rreturn,q.last_label,func_value,0);
-    }
-
     return func_value;
 }
 

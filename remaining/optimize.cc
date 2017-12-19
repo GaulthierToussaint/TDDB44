@@ -395,7 +395,7 @@ void ast_if::optimize()
     }
 
     if (else_body != NULL){
-        else_body -> optimize();
+        else_body->optimize();
     }
 }
 
@@ -412,7 +412,9 @@ void ast_return::optimize()
 void ast_functioncall::optimize()
 {
     /* Your code here */
-    parameter_list -> optimize();
+    if (parameter_list != NULL){
+        parameter_list ->optimize();
+    }
 }
 
 void ast_uminus::optimize()
